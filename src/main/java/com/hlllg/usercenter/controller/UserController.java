@@ -51,7 +51,7 @@ public class UserController implements UserConstant{
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null) {
-            new BusinessException(ErrorCode.NULL_ERROR);
+            throw new BusinessException(ErrorCode.NO_LOGIN);
         }
         User user = userService.getById(currentUser.getId());
         // TODO 校验用户是否合法
