@@ -1,6 +1,6 @@
 spring:
   application:
-    name: user-center
+    name: shine-backend
     # DataSource Config
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
