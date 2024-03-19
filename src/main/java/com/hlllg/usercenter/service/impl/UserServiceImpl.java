@@ -2,30 +2,22 @@ package com.hlllg.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.hlllg.usercenter.common.ErrorCode;
 import com.hlllg.usercenter.constant.UserConstant;
 import com.hlllg.usercenter.exception.BusinessException;
-import com.hlllg.usercenter.service.UserService;
-import com.hlllg.usercenter.model.domain.User;
 import com.hlllg.usercenter.mapper.UserMapper;
+import com.hlllg.usercenter.model.domain.User;
+import com.hlllg.usercenter.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
 * @author hlllg
@@ -161,7 +153,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         safetyUser.setUpdateTime(originalUser.getUpdateTime());
         safetyUser.setPlanetCode(originalUser.getPlanetCode());
         safetyUser.setUserRole(originalUser.getUserRole());
-        safetyUser.setTags(originalUser.getTags());
         return safetyUser;
     }
 
@@ -176,59 +167,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 移除用户登录态
         request.getSession().removeAttribute(USER_LOGIN_STATE);
         return 1;
-    }
-
-    /**
-     * 根据标签搜索用户(内存过滤)
-     *
-     * @param tagNameList 用户要拥有的标签
-     * @return
-     */
-    @Override
-    public List<User> searchUsersByTags(List<String> tagNameList) {
-        if (CollectionUtils.isEmpty(tagNameList)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        List<User> userList = userMapper.selectList(queryWrapper);
-        Gson gson = new Gson();
-        return userList.stream().filter(user -> {
-            String tagsStr = user.getTags();
-            // 判空 第一种方式
-//            if (StringUtils.isAnyBlank(tagsStr)) {
-//                return false;
-//            }
-            Set<String> tempTagNameSet = gson.fromJson(tagsStr, new TypeToken<Set<String>>() {
-            }.getType());
-            tempTagNameSet = Optional.ofNullable(tempTagNameSet).orElse(new HashSet<>());
-            for (String tagName : tempTagNameSet) {
-                if (!tempTagNameSet.contains(tagName)) {
-                    return false;
-                }
-            }
-            return true;
-        }).map(this::getSafetyUser).collect(Collectors.toList());
-    }
-
-
-
-    /**
-     * 根据标签搜索用户(SQL 查询版)
-     *
-     * @param tagNameList 用户要拥有的标签
-     * @return
-     */
-    @Deprecated
-    private List<User> searchUsersByTagsBySQL(List<String> tagNameList) {
-        if (CollectionUtils.isEmpty(tagNameList)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        for (String tagName : tagNameList) {
-            queryWrapper.like("tags", tagName);
-        }
-        List<User> usersList = userMapper.selectList(queryWrapper);
-        return usersList.stream().map(this::getSafetyUser).collect(Collectors.toList());
     }
 }
 

@@ -70,11 +70,5 @@ class UserServiceTest {
         Assertions.assertEquals(-1, result);
     }
 
-    @Test
-    public void testSearchUsersByTags() {
-        List<String> list = Arrays.asList("java", "python");
-        List<User> userList = userService.searchUsersByTags(list);
-        Assertions.assertNotNull(userList);
-    }
 
 }

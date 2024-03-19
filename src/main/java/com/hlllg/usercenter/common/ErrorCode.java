@@ -1,7 +1,5 @@
 package com.hlllg.usercenter.common;
 
-import lombok.Data;
-
 /**
  * @author 何国亮
  * @version 1.0

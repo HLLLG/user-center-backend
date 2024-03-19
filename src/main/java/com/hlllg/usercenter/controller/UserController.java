@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/user")
+//@CrossOrigin(originPatterns = "*", allowCredentials = "true")
 public class UserController implements UserConstant{
 
     @Resource
